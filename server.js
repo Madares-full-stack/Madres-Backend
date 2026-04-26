@@ -1,7 +1,12 @@
-const express = require("express");
+const express =require("express")
 const app = express();
+
 const db = require("./models/db");
 app.use(express.json());
+const roleRouter =require("./routers/roleRouter");
+app.use("/role",roleRouter)
+const attendanceRouter=require("./routers/attendanceRoute");
+app.use("/attendance",attendanceRouter)
 
 
 

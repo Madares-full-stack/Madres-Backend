@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 mongoose
-  .connect('')
+  .connect('mongodb://localhost:27017/madares')
   .then(() => {
     console.log("DB Ready To Use");
   })
