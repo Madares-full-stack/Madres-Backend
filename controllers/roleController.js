@@ -5,7 +5,7 @@ const createRole =async (req,res) => {
         const {name,permissions}=req.body;
         const exists =await roleModel.findOne({name})
         if(exists){
-            res.status(400).json({
+            res.status(404).json({
                 success:false,
                 message:"Role already exists"
             })

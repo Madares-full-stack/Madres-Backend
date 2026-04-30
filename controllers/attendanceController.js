@@ -1,12 +1,27 @@
 const attendanceModel = require("../models/attendanceSchema");
+
+const serverError=(req,res)=>{
+  return res.status(500).json({
+    success:false,
+    message:"Server error"
+  })
+}
+
+
 const getMyAttendance = async (req, res) => {
   try {
     let record;
     if (req.user.role.name === "student") {
       record = await attendanceModel.find({
-        studentId: req.user._Id,
+
+        studentId: req.user._id
       });
+      return res.status(200).json({
+        success:true,
+        attendance:record
+      })
     }
+
     if (req.user.role.name === "parent") {
       record = await attendanceModel.find({
         studentId: { $in: req.user.children },
@@ -17,18 +32,22 @@ const getMyAttendance = async (req, res) => {
         attendance: record,
       });
     }
+    if(req.user.name ==="admin"|| req.user.name === "teacher"){
+      record =await attendanceModel.find({})
+      return res.status(200).json({
+        success:true,
+        attendance:record
+      })
+    }
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+   return serverError(req,res)
   }
 };
 
 const getAttendance = async (req, res) => {
   try {
-    const result = await attendanceModel.find({});
-    if (!result) {
+    const result = await attendanceModel.find({}).populate("studentId","name");
+    if (result.length === 0) {
       res.status(404).json({
         success: false,
         message: "No attendance found",
@@ -41,31 +60,25 @@ const getAttendance = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+   return serverError(req,res)
   }
 };
 
 const createAttendance = async (req, res) => {
   try {
     const { studentId, date, status } = req.body;
-    const record = new attendanceModel({
+    const record =  new attendanceModel({
       studentId,
       date,
       status,
     });
-    record.save();
+   const saved=await  record.save();
     res.status(201).json({
       success: true,
-      result: record,
+      result: saved,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    return  serverError(req,res)
   }
 };
 const updateAttendance = async (req, res) => {
@@ -89,10 +102,7 @@ const updateAttendance = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+   return serverError(req,res)
   }
 };
 
@@ -112,10 +122,7 @@ const deleteAttendance = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+  return serverError(req,res)
   }
 };
 
