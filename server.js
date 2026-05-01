@@ -1,17 +1,26 @@
-const express =require("express")
+require("dotenv").config();
+const express = require("express");
 const app = express();
 
-const db = require("./models/db");
+const connectDB = require("./models/db");
+
 app.use(express.json());
-const roleRouter =require("./routers/roleRouter");
-app.use("/role",roleRouter)
-const attendanceRouter=require("./routers/attendanceRoute");
-app.use("/attendance",attendanceRouter)
 
+// Routes
+const authRouter = require("./routers/auth.routes");
+const userRouter = require("./routers/user.routes");
+const roleRouter = require("./routers/roleRouter");
+const attendanceRouter = require("./routers/attendanceRoute");
 
+app.use("/auth", authRouter);
+app.use("/", userRouter);
+app.use("/role", roleRouter);
+app.use("/attendance", attendanceRouter);
 
+const PORT = process.env.PORT || 5000;
 
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Example application listening at http://localhost:${PORT}`);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
 });
