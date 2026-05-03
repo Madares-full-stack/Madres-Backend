@@ -5,11 +5,11 @@ const getMyAttendance = async (req, res) => {
     let record;
     if (req.user.role.name === "student") {
       record = await attendanceModel.find({ 
-        studentId: req.user.id
+        studentId: req.user._id
       });
-      return res.status(200).json({
+       res.status(200).json({
         success: true,
-        attendance: record 
+        attendance: record
       });
     }
     if (req.user.role.name === "parent") {
@@ -18,7 +18,7 @@ const getMyAttendance = async (req, res) => {
       });
       return res.status(200).json({
         success: true,
-        attendance: record 
+        attendance: record,
       });
     }
     return res.status(403).json({ 
@@ -28,7 +28,7 @@ const getMyAttendance = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ 
       success: false,
-      message: "Server error"
+      message: "Server error",
     });
   }
 };
@@ -36,8 +36,8 @@ const getMyAttendance = async (req, res) => {
 const getAttendance = async (req, res) => {
   try {
     const result = await attendanceModel.find({});
-    if (!result || result.length === 0) {
-      return res.status(404).json({
+    if (!result) {
+      res.status(404).json({
         success: false,
         message: "No attendance found"
       });
@@ -114,15 +114,15 @@ const deleteAttendance = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ 
       success: false,
-      message: "Server error" 
+      message: "Server error",
     });
   }
 };
 
-module.exports = { .
+module.exports = { 
   getAttendance, 
   createAttendance, 
   getMyAttendance, 
   deleteAttendance,
-  updateAttendance.
+  updateAttendance,
   };
