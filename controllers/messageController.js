@@ -57,10 +57,10 @@ const updateMessage=async(req,res)=>{
     try{
 
         const {id} =req.params;
-        const {content}=req.body
+        const { content }=req.body
 
 
-        const result =await messageModel.findByIdAndUpdate(id,content,{new:true})
+        const result =await messageModel.findByIdAndUpdate(id,{ content },{new:true})
    
         if(!result){
             return res.status(404).json({

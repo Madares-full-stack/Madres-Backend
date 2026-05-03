@@ -15,11 +15,11 @@ const getMyAttendance = async (req, res) => {
 
     if (req.user.role.name === "parent") {
       record = await attendanceModel.find({
-        studentId: { $in: req.user.children },
+        studentId: { $in: req.user.children  || [] },
       });
       return res.status(200).json({ success: true, attendance: record });
     }
-    if (req.user.name === "admin" || req.user.name === "teacher") {
+    if (req.user.role.name === "admin" || req.user.role.name === "teacher") {
       record = await attendanceModel.find({});
       return res.status(200).json({
         success: true,
