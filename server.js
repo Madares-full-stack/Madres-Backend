@@ -1,8 +1,8 @@
 require("dotenv").config();
-const express = require("express");
+const express= require("express");
 const app = express();
 
-const connectDB = require("./models/db");
+const db = require("./models/db");
 
 app.use(express.json());
 
@@ -17,10 +17,10 @@ app.use("/", userRouter);
 app.use("/role", roleRouter);
 app.use("/attendance", attendanceRouter);
 
-const PORT = process.env.PORT || 5000;
+const PORT =  5000;
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+ app.listen(PORT, () => {
+  console.log(`Example application listening at http://localhost:${PORT}`);
   });
 });
