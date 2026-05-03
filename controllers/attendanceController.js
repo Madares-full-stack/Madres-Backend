@@ -5,7 +5,7 @@ const getMyAttendance = async (req, res) => {
     let record;
     if (req.user.role.name === "student") {
       record = await attendanceModel.find({ 
-        studentId: req.user._id
+        studentId: req.user._id,
       });
        res.status(200).json({
         success: true,
@@ -16,7 +16,7 @@ const getMyAttendance = async (req, res) => {
       record = await attendanceModel.find({
         studentId: { $in: req.user.children },
       });
-      return res.status(200).json({
+       res.status(200).json({
         success: true,
         attendance: record,
       });
@@ -26,7 +26,7 @@ const getMyAttendance = async (req, res) => {
       message: "Forbidden" 
     });
   } catch (err) {
-    return res.status(500).json({ 
+     res.status(500).json({ 
       success: false,
       message: "Server error",
     });
@@ -42,14 +42,15 @@ const getAttendance = async (req, res) => {
         message: "No attendance found"
       });
     }
-    return res.status(200).json({
-      success: true, 
-      attendance: result
+    res.status(200).json({
+        success: true,
+        message: "All attendance was found ",
+        attendance: result,
     });
   } catch (err) {
-    return res.status(500).json({
+     res.status(500).json({
       success: false, 
-      message: "Server error" 
+      message: "Server error", 
     });
   }
 };
@@ -57,9 +58,9 @@ const getAttendance = async (req, res) => {
 const createAttendance = async (req, res) => {
   try {
     const { studentId, date, status } = req.body;
-    const record = new attendanceModel({ 
+    const record = new attendanceModel({
       studentId,
-       date,
+      date,
       status,
     });
     await record.save();
@@ -78,7 +79,8 @@ const createAttendance = async (req, res) => {
 const updateAttendance = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await attendanceModel.findByIdAndUpdate(id, req.body, { new: true });
+    const result = await attendanceModel.findByIdAndUpdate(id, req.body, { 
+      new: true });
     if (!result) {
       return res.status(404).json({
         success: false,
