@@ -21,13 +21,12 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
     },
     role: {
-      type: String,
-      enum: ["admin", "teacher", "student", "parent"],
-      default: "student",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Role",
     },
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Hash password before save
