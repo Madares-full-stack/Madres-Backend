@@ -4,8 +4,13 @@ const getMyAttendance = async (req, res) => {
   try {
     let record;
     if (req.user.role.name === "student") {
-      record = await attendanceModel.find({ studentId: req.user.id });
-      return res.status(200).json({ success: true, attendance: record });
+      record = await attendanceModel.find({ 
+        studentId: req.user.id
+      });
+      return res.status(200).json({
+        success: true,
+        attendance: record 
+      });
     }
     if (req.user.role.name === "parent") {
       record = await attendanceModel.find({
@@ -16,7 +21,10 @@ const getMyAttendance = async (req, res) => {
         attendance: record 
       });
     }
-    return res.status(403).json({ success: false, message: "Forbidden" });
+    return res.status(403).json({ 
+      success: false,
+      message: "Forbidden" 
+    });
   } catch (err) {
     return res.status(500).json({ 
       success: false,
