@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-
-const verifyToken = (req, res, next) => {
+const userModel = require("../models/user.model");
+const verifyToken = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -14,7 +14,15 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    const user = await userModel.findById(decoded.id).populate("role");
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+    req.user = user;
     next();
   } catch (err) {
     return res.status(401).json({
@@ -26,7 +34,9 @@ const verifyToken = (req, res, next) => {
 
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    
+
+    if (!req.user || !roles.includes(req.user?.role?.name)) {
       return res.status(403).json({
         success: false,
         message: `Access forbidden. Required role(s): ${roles.join(", ")}`,
