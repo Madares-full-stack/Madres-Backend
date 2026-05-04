@@ -7,27 +7,27 @@ const {
   updateSchedule,
   deleteSchedule
 } = require('../controllers/scheduleController');
-const { protect, restrictTo } = require('../middlewares/authMiddleware');
+const { verifyToken, authorizeRoles } = require('../middlewares/auth.middleware');
 const validatorMiddleware = require('../middlewares/validatorMiddleware');
 const { createScheduleValidator, updateScheduleValidator } = require('../validations/scheduleValidation');
 
 router.route('/')
-  .get(protect, getAllSchedules)
+  .get(verifyToken, getAllSchedules)
   .post(
-    protect,
-    restrictTo('admin', 'teacher'),
+    verifyToken,
+    authorizeRoles('admin', 'teacher'),
     validatorMiddleware(createScheduleValidator),
     createSchedule
   );
 
 router.route('/:id')
-  .get(protect, getScheduleById)
+  .get(verifyToken, getScheduleById)
   .put(
-    protect,
-    restrictTo('admin', 'teacher'),
+    verifyToken,
+    authorizeRoles('admin', 'teacher'),
     validatorMiddleware(updateScheduleValidator),
     updateSchedule
   )
-  .delete(protect, restrictTo('admin', 'teacher'), deleteSchedule);
+  .delete(verifyToken, authorizeRoles('admin', 'teacher'), deleteSchedule);
 
 module.exports = router;

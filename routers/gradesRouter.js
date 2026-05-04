@@ -2,7 +2,7 @@ const express =require("express");
 const gradesRouter =express.Router();
 const {createGrade,getGradeById,getGrades,updateGrades,deleteGrades} =require
 ("../controllers/gradesController")
-const { verifyToken, authorizeRoles } = require("../middleware/auth.middleware");
+const { verifyToken, authorizeRoles } = require("../middlewares/auth.middleware");
 
 
 gradesRouter.get("/", verifyToken, authorizeRoles("admin", "teacher", "student", "parent"), getGrades);

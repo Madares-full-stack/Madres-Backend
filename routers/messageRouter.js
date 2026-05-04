@@ -2,7 +2,7 @@ const express =require('express');
 
 const messageRouter = express.Router();
 const {sendMessage,getMessage,updateMessage,deleteMessage}=require("../controllers/messageController");
-const { verifyToken, authorizeRoles } = require("../middleware/auth.middleware");
+const { verifyToken, authorizeRoles } = require("../middlewares/auth.middleware");
 
 
 messageRouter.get("/", verifyToken, getMessage);

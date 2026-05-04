@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const Schedule = require('../routers/Schedule');
+const Schedule = require('../models/Schedule');
 const ApiError = require('../utils/apiError');
 
 exports.createSchedule = asyncHandler(async (req, res, next) => {

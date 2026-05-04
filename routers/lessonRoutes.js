@@ -7,30 +7,30 @@ const {
   updateLesson,
   deleteLesson
 } = require('../controllers/lessonController');
-const { protect, restrictTo } = require('../middlewares/authMiddleware');
+const { verifyToken, authorizeRoles }  = require('../middlewares/auth.middleware');
 const { uploadLessonFiles } = require('../middlewares/uploadMiddleware');
 const validatorMiddleware = require('../middlewares/validatorMiddleware');
 const { createLessonValidator, updateLessonValidator } = require('../validations/lessonValidation');
 
 router.route('/')
-  .get(protect, getAllLessons)
+  .get(verifyToken, getAllLessons)
   .post(
-    protect,
-    restrictTo('admin', 'teacher'),
+    verifyToken,
+    authorizeRoles('admin', 'teacher'),
     uploadLessonFiles,
     validatorMiddleware(createLessonValidator),
     createLesson
   );
 
 router.route('/:id')
-  .get(protect, getLessonById)
+  .get(verifyToken, getLessonById)
   .put(
-    protect,
-    restrictTo('admin', 'teacher'),
+    verifyToken,
+    authorizeRoles('admin', 'teacher'),
     uploadLessonFiles,
     validatorMiddleware(updateLessonValidator),
     updateLesson
   )
-  .delete(protect, restrictTo('admin', 'teacher'), deleteLesson);
+  .delete(verifyToken, authorizeRoles('admin', 'teacher'), deleteLesson);
 
 module.exports = router;
