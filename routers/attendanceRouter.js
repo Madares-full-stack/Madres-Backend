@@ -1,6 +1,6 @@
 const express = require("express");
 const attendanceRouter = express.Router();
-const { verifyToken, authorizeRoles } = require("../middleware/auth.middleware");
+const { verifyToken, authorizeRoles } = require("../middlewares/auth.middleware");
 const {
   createAttendance,
   updateAttendance,

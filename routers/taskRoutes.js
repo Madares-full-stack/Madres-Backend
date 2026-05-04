@@ -7,27 +7,27 @@ const {
   updateTask,
   deleteTask
 } = require('../controllers/taskController');
-const { protect, restrictTo } = require('../middlewares/authMiddleware');
+const { verifyToken, authorizeRoles }  = require('../middlewares/auth.middleware');
 const validatorMiddleware = require('../middlewares/validatorMiddleware');
 const { createTaskValidator, updateTaskValidator } = require('../validations/taskValidation');
 
 router.route('/')
-  .get(protect, getAllTasks)
+  .get(verifyToken, getAllTasks)
   .post(
-    protect,
-    restrictTo('admin', 'teacher'),
+    verifyToken,
+    authorizeRoles('admin', 'teacher'),
     validatorMiddleware(createTaskValidator),
     createTask
   );
 
 router.route('/:id')
-  .get(protect, getTaskById)
+  .get(verifyToken, getTaskById)
   .put(
-    protect,
-    restrictTo('admin', 'teacher'),
+    verifyToken,
+    authorizeRoles('admin', 'teacher'),
     validatorMiddleware(updateTaskValidator),
     updateTask
   )
-  .delete(protect, restrictTo('admin', 'teacher'), deleteTask);
+  .delete(verifyToken, authorizeRoles('admin', 'teacher'), deleteTask);
 
 module.exports = router;

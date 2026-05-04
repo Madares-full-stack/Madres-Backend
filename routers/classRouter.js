@@ -2,7 +2,7 @@ const express =require("express")
 const classRouter=express.Router();
 const {getClass,getClasses,deleteClass,updateClass,createClass}= require("../controllers/classController");
 const { create } = require("../models/roleSchema");
-const { verifyToken, authorizeRoles } = require("../middleware/auth.middleware");
+const { verifyToken, authorizeRoles } = require("../middlewares/auth.middleware");
 
 
 classRouter.get("/", verifyToken, authorizeRoles("admin", "teacher", "student", "parent"), getClasses);
