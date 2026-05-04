@@ -1,52 +1,53 @@
-
 require("dotenv").config();
 const express = require("express");
-
 const http = require("http");
 const cors = require("cors");
-const connectDB = require("./models/db")
+
+const connectDB = require("./models/db");
+const { initSocket } = require("./socket/socket");
+
+// error handling
+const ApiError = require("./utils/ApiError");
+const errorMiddleware = require("./middlewares/errorMiddleware");
+
 const app = express();
 const server = http.createServer(app);
 
-//  SOCKET
-const { initSocket } = require("./socket/socket");
+// SOCKET
 initSocket(server);
 
- //MIDDLEWARE 
+// MIDDLEWARE
 app.use(cors());
-app.use(express.json());
-
-connectDB();
-
-//routes
-app.use("/role", require("./routers/roleRouter"));
-app.use("/attendance", require("./routers/attendanceRouter"));
-app.use("/class", require("./routers/classRouter"));
-app.use("/submission", require("./routers/submissionRouter"));
-app.use("/grades", require("./routers/gradesRouter"));
-app.use("/auth", require("./routers/auth.routes"));
-app.use("/users", require("./routers/user.routes")); 
-app.use("/message", require("./routers/messageRouter"));
-
-const PORT = process.env.PORT || 5000;
-
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/lessons', lessonRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/schedules', scheduleRoutes);
+// DB
+connectDB();
 
-app.all('*', (req, res, next) => {
-  next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
+// ROUTES
+app.use("/api/roles", require("./routers/roleRouter"));
+app.use("/api/attendance", require("./routers/attendanceRouter"));
+app.use("/api/classes", require("./routers/classRouter"));
+app.use("/api/submissions", require("./routers/submissionRouter"));
+app.use("/api/grades", require("./routers/gradesRouter"));
+app.use("/api/auth", require("./routers/auth.routes"));
+app.use("/api/users", require("./routers/user.routes"));
+app.use("/api/messages", require("./routers/messageRouter"));
+
+app.use("/api/lessons", require("./routers/lessonRoutes"));
+app.use("/api/tasks", require("./routers/taskRoutes"));
+app.use("/api/schedules", require("./routers/scheduleRoutes"));
+
+// 404
+app.all("*", (req, res, next) => {
+  next(new ApiError(`Can't find this route: ${req.originalUrl}`, 404));
 });
 
+// ERROR HANDLER
 app.use(errorMiddleware);
 
+// SERVER
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(` Server running on port ${PORT}`);
 });
