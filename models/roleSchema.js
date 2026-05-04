@@ -1,8 +1,11 @@
-const mongoose =require("mongoose");
-const roleSchema =new mongoose.Schema({
-    name:{type:String ,required:true, enum:["admin","teacher","parent","student"]},
-    permissions:[{
-        type:String
-    }]
-})
-module.exports =mongoose.model("Role",roleSchema);
+const mongoose = require("mongoose");
+
+const roleSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    enum: ["admin", "teacher", "parent", "student"],
+  }
+});
+
+module.exports = mongoose.model("Role", roleSchema);

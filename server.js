@@ -1,35 +1,32 @@
-const express = require('express');
-const lessonRoutes = require('./Madres-Backend/routers/lessonRoutes');
-const ApiError = require('./Madres-Backend/utils/apiError');
-const errorMiddleware = require('./Madres-Backend/middlewares/errorMiddleware');
-
-const app = express();
-const taskRoutes = require('./Madres-Backend/routers/taskRoutes');
-const scheduleRoutes = require('./Madres-Backend/routers/scheduleRoutes');
-
-
 const express =require("express")
 require("dotenv").config()
 const app = express();
-const cors=require("cors")
-const db = require("./models/db");
+const server = http.createServer(app);
+
+//  SOCKET
+const { initSocket } = require("./socket/socket");
+initSocket(server);
+
+ //MIDDLEWARE 
+app.use(cors());
 app.use(express.json());
-const roleRouter =require("./routers/roleRouter");
-app.use("/role",roleRouter)
-const attendanceRouter=require("./routers/attendanceRouter");
-app.use("/attendance",attendanceRouter)
-const classRouter =require("./routers/classRouter");
-app.use("/class" ,classRouter)
-const submissionRouter =require("./routers/submissionRouter");
-app.use("/submission",submissionRouter);
-const gradesRouter =require("./routers/gradesRouter");
-app.use("/grades",gradesRouter)
 
+connectDB();
 
-const PORT= process.env.PORT
+//routes
+app.use("/role", require("./routers/roleRouter"));
+app.use("/attendance", require("./routers/attendanceRouter"));
+app.use("/class", require("./routers/classRouter"));
+app.use("/submission", require("./routers/submissionRouter"));
+app.use("/grades", require("./routers/gradesRouter"));
+app.use("/auth", require("./routers/auth.routes"));
+app.use("/users", require("./routers/user.routes")); 
+app.use("/message", require("./routers/messageRouter"));
 
-app.listen(PORT, () => {
-  console.log(`Example application listening at http://localhost:${PORT}`);
+const PORT = process.env.PORT || 5000;
+
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

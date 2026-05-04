@@ -42,8 +42,8 @@ const createSubmission=async(req,res)=>{
 
     await newSubmission.save();
     res.status(201).json({
-      success:false,
-      message:"Submission cerated successfully",
+      success:true,
+      message:"Submission created successfully",
       submission:newSubmission
     })
   }catch(err){
