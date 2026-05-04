@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const roleModel =require("../models/roleSchema");
 
 const register = async (req, res) => {
   try {
@@ -13,9 +14,14 @@ const register = async (req, res) => {
     }
 
     // Only allow safe roles on public register
-    const safeRole = ["teacher", "student", "parent"].includes(role)
+    const safeRole = ["teacher", "student", "parent", "admin"].includes(role)
       ? role
       : "student";
+
+      const roleDoc = await roleModel.findOne({ name:safeRole });
+    if (!roleDoc) {
+      return res.status(400).json({ success: false, message: "Role not found." });
+    }
 
     const exists = await User.findOne({ email });
     if (exists) {
@@ -25,7 +31,7 @@ const register = async (req, res) => {
       });
     }
 
-    const user = await User.create({ name, email, password, role: safeRole });
+    const user = await User.create({ name, email, password, role: role._id });
 
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
