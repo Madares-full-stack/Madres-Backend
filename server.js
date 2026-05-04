@@ -1,10 +1,10 @@
+
 require("dotenv").config();
 const express = require("express");
 
 const http = require("http");
 const cors = require("cors");
-const connectDB = require("./models/db");
-
+const connectDB = require("./models/db")
 const app = express();
 const server = http.createServer(app);
 
@@ -32,4 +32,21 @@ const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/api/lessons', lessonRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/schedules', scheduleRoutes);
+
+app.all('*', (req, res, next) => {
+  next(new ApiError(`Can't find this route: ${req.originalUrl}`, 400));
+});
+
+app.use(errorMiddleware);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
