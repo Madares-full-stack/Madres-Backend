@@ -2,7 +2,7 @@ const User = require("../models/user.model");
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().populate("role").select("-password");
+    const users = await User.find().populate("role","name").select("-password");
     return res.status(200).json({ success: true, count: users.length, users });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -11,7 +11,7 @@ const getAllUsers = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { name, email, password, role = "student" } = req.body;
+    const { name, email, password, roleId } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -33,7 +33,7 @@ const createUser = async (req, res) => {
       return res.status(409).json({ success: false, message: "Email already registered." });
     }
 
-    const user = await User.create({ name, email, password, role });
+    const user = await User.create({ name, email, password, role:roleId });
 
     return res.status(201).json({
       success: true,

@@ -1,26 +1,24 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
-const roleModel =require("../models/roleSchema");
+const roleModel = require("../models/roleSchema");
 
 const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !role) {
       return res.status(400).json({
         success: false,
-        message: "name, email, and password are required.",
+        message: "name, email, password, and role are required.",
       });
     }
 
-    // Only allow safe roles on public register
-    const safeRole = ["teacher", "student", "parent", "admin"].includes(role)
-      ? role
-      : "student";
-
-      const roleDoc = await roleModel.findOne({ name:safeRole });
+    const roleDoc = await roleModel.findOne({ name: role });
     if (!roleDoc) {
-      return res.status(400).json({ success: false, message: "Role not found." });
+      return res.status(404).json({
+        success: false,
+        message: `Role "${role}" not found. Please create it first.`,
+      });
     }
 
     const exists = await User.findOne({ email });
@@ -31,10 +29,11 @@ const register = async (req, res) => {
       });
     }
 
-    const user = await User.create({ name, email, password, role: role._id });
+    
+    const user = await User.create({ name, email, password, role: roleDoc._id });
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: user._id, email: user.email, role: roleDoc.name }, 
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
     );
@@ -43,7 +42,12 @@ const register = async (req, res) => {
       success: true,
       message: "User registered successfully.",
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: roleDoc.name, 
+      },
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -61,7 +65,8 @@ const login = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+  
+    const user = await User.findOne({ email }).populate("role");
     if (!user) {
       return res.status(401).json({ success: false, message: "Invalid credentials." });
     }
@@ -72,7 +77,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: user._id, email: user.email, role: user.role.name }, 
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
     );
@@ -81,7 +86,12 @@ const login = async (req, res) => {
       success: true,
       message: "Login successful.",
       token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role.name, 
+      },
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });

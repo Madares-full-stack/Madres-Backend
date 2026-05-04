@@ -2,17 +2,16 @@ const roleModel = require("../models/roleSchema");
 
 const createRole = async (req, res) => {
   try {
-    const { name, permissions } = req.body;
+    const { name} = req.body;
     const exists = await roleModel.findOne({ name });
     if (exists) {
-      res.status(404).json({
+      return res.status(400).json({
         success: false,
         message: "Role already exists",
       });
     } else {
-      const newRole = roleModel({
+      const newRole = new roleModel({
         name,
-        permissions,
       });
       const saved = await newRole.save();
       res.status(201).json({
