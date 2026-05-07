@@ -13,7 +13,7 @@ const getClasses = async (req, res) => {
     const result = await classModel
       .find({})
       .populate("teacher")
-      .populate("students");
+      .populate("students","name");
     if (result.length === 0) {
       res.status(404).json({
         success: false,
@@ -35,7 +35,7 @@ const getClasses = async (req, res) => {
 const getClass = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await classModel.findById(id);
+    const result = await classModel.findById(id).populate("teacher").populate("students");
     if (!result) {
       return res.status(404).json({
         success: false,
@@ -61,11 +61,13 @@ const createClass = async (req, res) => {
       teacher,
       students,
     });
+    console.log(students)
     const saved = await newClass.save();
+    const populated = await classModel.findById(saved._id).populate("teacher").populate("students","name");
     res.status(201).json({
       success: true,
       message: "Class created successfully",
-      class: saved,
+      class: populated,
     });
   } catch (err) {
    return serverError(req,res)

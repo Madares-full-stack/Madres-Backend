@@ -1,4 +1,10 @@
 const attendanceModel = require("../models/attendanceSchema");
+const serverError = (req, res) => {
+  return res.status(500).json({
+    success: false,
+    message: "Server error",
+  });
+};
 
 const getMyAttendance = async (req, res) => {
   try {
@@ -54,21 +60,49 @@ const getAttendance = async (req, res) => {
 
 const createAttendance = async (req, res) => {
   try {
-    const { studentId, date, status } = req.body;
-    const record = new attendanceModel({
-      studentId,
-      date,
-      status,
-    });
-    const saved = await record.save();
-    res.status(201).json({
+    const { record } = req.body;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+   
+    const studentIds = record.map(r => r.studentId);
+    console.log(studentIds)
+  
+    const existingRecords = await attendanceModel.find({
+      studentId: { $in: studentIds },
+      date: { $gte: today }
+    }).select('studentId');
+
+    const existingIdSet = new Set(existingRecords.map(r => r.studentId.toString()));
+
+    const dataToInsert = record
+      .filter(r => !existingIdSet.has(r.studentId.toString()))
+      .map(r => ({
+        studentId: r.studentId,
+        status: r.status,
+        date: new Date()
+      }));
+
+    if (dataToInsert.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No new records to save; all duplicates ignored."
+      });
+    }
+
+    const saved = await attendanceModel.insertMany(dataToInsert);
+
+    return res.status(201).json({
       success: true,
+      message: `${saved.length} records saved successfully.`,
       result: saved,
     });
   } catch (err) {
-    return serverError(req, res);
+    console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 const updateAttendance = async (req, res) => {
   try {
