@@ -18,7 +18,7 @@ const taskSchema = new mongoose.Schema(
     },
     teacherId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Teachers',
+      ref: 'Users',
       required: true
     },
     classId: {

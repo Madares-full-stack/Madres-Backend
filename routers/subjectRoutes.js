@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getAllSubjects,
+ getAllSubjects,
   getSubjectById,
   createSubject,
   updateSubject,
   deleteSubject,
 } = require('../controllers/Subject.controller');
-const { validateSubject } = require('../middleware/validate');
+const { verifyToken, authorizeRoles } = require("../middlewares/auth.middleware");
+const {validateSubject} = require("../middlewares/validate")
 
 
 router.get("/", verifyToken, authorizeRoles("admin", "teacher", "student", "parent"), getAllSubjects);

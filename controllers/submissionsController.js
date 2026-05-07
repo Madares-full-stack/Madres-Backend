@@ -11,7 +11,9 @@ const serverError=(req,res)=>{
 
 const getSubmission=async(req,res)=>{
     try{
-     const result =await submissionsModel.find({})
+     const result =await submissionsModel.find({}).populate("student", "name ")
+      .populate("task", "title");
+
      if(result.length === 0 ){
     return res.status(404).json({
         success:false,
@@ -20,7 +22,7 @@ const getSubmission=async(req,res)=>{
      }else{
         res.status(200).json({
             success:true,
-        submission:result
+            submission:result
         })
      }
 
