@@ -15,7 +15,7 @@ router.route('/')
   .get(verifyToken, getAllTasks)
   .post(
     verifyToken,
-    authorizeRoles('admin', 'teacher'),
+    authorizeRoles('admin', 'teacher',"student"),
     validatorMiddleware(createTaskValidator),
     createTask
   );

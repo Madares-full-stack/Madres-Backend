@@ -13,12 +13,12 @@ const taskSchema = new mongoose.Schema(
     },
     subjectId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Subjects',
+      ref: 'Subject',
       required: true
     },
     teacherId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Users',
+      ref: 'User',
       required: true
     },
     classId: {
