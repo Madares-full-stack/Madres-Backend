@@ -20,7 +20,7 @@ exports.getAllTasks = asyncHandler(async (req, res, next) => {
     .skip(skip)
     .limit(limit)
     .populate('subjectId', 'name')
-    .populate('teacherId', 'userId')
+    .populate('teacherId', 'name')
     .populate('classId', 'name');
 
   res.status(200).json({ results: tasks.length, page, data: tasks });
@@ -28,9 +28,9 @@ exports.getAllTasks = asyncHandler(async (req, res, next) => {
 
 exports.getTaskById = asyncHandler(async (req, res, next) => {
   const task = await Task.findById(req.params.id)
-    .populate('subjectId')
-    .populate('teacherId')
-    .populate('classId');
+    .populate('subjectId',"name")
+    .populate('teacherId',"name")
+    .populate('classId',"name");
 
   if (!task) {
     return next(new ApiError('Task not found', 404));

@@ -1,26 +1,73 @@
 const gradesModel = require("../models/gradesSchema");
 
-
-const serverError=(req,res)=>{
+const serverError = (req, res) => {
   return res.status(500).json({
-    success:false,
-    message:"Server error"
-  })
-}
+    success: false,
+    message: "Server error",
+  });
+};
 
 //get all Grades
 const getGrades = async (req, res) => {
   try {
     const result = await gradesModel
       .find({})
-      .populate("student")
-      .populate("subject");
+      .populate("student", "name")
+      .populate("subject", "name");
     res.status(200).json({
       success: true,
       grades: result,
     });
   } catch (err) {
-  return serverError(req,res)
+    return serverError(req, res);
+  }
+};
+
+const getMyGrades = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const role = req.user?.role?.name || req.user?.role;
+
+    let result = [];
+
+    if (role === "student") {
+      result = await gradesModel
+        .find({ student: req.user._id })
+        .populate("student", "name classId")
+        .populate("subject", "name");
+    }
+
+    else if (role === "parent") {
+      const childIds = (req.user.children || []).map(
+        (c) => c._id || c
+      );
+
+      result = await gradesModel
+        .find({ student: { $in: childIds } })
+        .populate("student", "name classId")
+        .populate("subject", "name");
+    }
+
+    else {
+      return res.status(403).json({
+        success: false,
+        message: "Not allowed",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      grades: result,
+    });
+
+  } catch (err) {
+   return serverError(req,res)
   }
 };
 
@@ -39,7 +86,7 @@ const createGrade = async (req, res) => {
       grade: newGrade,
     });
   } catch (err) {
-  return serverError(req,res)
+    return serverError(req, res);
   }
 };
 
@@ -64,7 +111,7 @@ const getGradeById = async (req, res) => {
       });
     }
   } catch (err) {
-  return serverError(req,res)
+    return serverError(req, res);
   }
 };
 
@@ -89,30 +136,29 @@ const updateGrades = async (req, res) => {
       });
     }
   } catch (err) {
-  return serverError(req,res)
+    return serverError(req, res);
   }
 };
 
-//delete grade 
+//delete grade
 const deleteGrades = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await gradesModel.findByIdAndDelete(id);
 
-    if(!result){
-        return res.status(404).json({
-            success:false,
-            message:"Grade not found "
-        })
-    }else{
-        res.status(200).json({
-            success:true,
-            message:"Grade deleted successfully"
-        })
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "Grade not found ",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "Grade deleted successfully",
+      });
     }
-
   } catch (err) {
-   return serverError(req,res)
+    return serverError(req, res);
   }
 };
 
@@ -122,4 +168,5 @@ module.exports = {
   createGrade,
   updateGrades,
   deleteGrades,
+  getMyGrades,
 };

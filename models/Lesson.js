@@ -13,7 +13,7 @@ const lessonSchema = new mongoose.Schema(
     },
     subjectId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Subject',
       required: true
     },
     teacherId: {
