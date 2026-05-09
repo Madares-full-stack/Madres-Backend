@@ -29,6 +29,7 @@ app.use("/api/roles", require("./routers/roleRouter"));
 app.use("/api/attendance", require("./routers/attendanceRouter"));
 app.use("/api/classes", require("./routers/classRouter"));
 app.use("/api/submissions", require("./routers/submissionRouter"));
+app.use("/api/subject" ,require("./routers/subjectRoutes"))
 app.use("/api/grades", require("./routers/gradesRouter"));
 app.use("/api/auth", require("./routers/auth.routes"));
 app.use("/api/users", require("./routers/user.routes"));

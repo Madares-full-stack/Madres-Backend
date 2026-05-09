@@ -1,4 +1,10 @@
 const attendanceModel = require("../models/attendanceSchema");
+const serverError = (req, res) => {
+  return res.status(500).json({
+    success: false,
+    message: "Server error",
+  });
+};
 
 const serverError = (res) => res.status(500).json({ success: false, message: "Server error" });
 
@@ -6,11 +12,35 @@ const getMyAttendance = async (req, res) => {
   try {
     const roleName = req.user?.role?.name;
     let record;
-    if (roleName === "student") {
-      record = await attendanceModel.find({ studentId: req.user._id });
-    } else if (roleName === "parent") {
-      record = await attendanceModel.find({ studentId: { $in: req.user.children || [] } });
-    } else if (roleName === "admin" || roleName === "teacher") {
+    if (req.user.role.name === "student") {
+      record = await attendanceModel
+        .find({
+          studentId: req.user._id,
+        })
+        .populate("studentId");
+      return res.status(200).json({
+        success: true,
+        attendance: record,
+      });
+    }
+
+    if (req.user.role.name === "parent") {
+      const childIds = (req.user.children || []).map(
+        (child) => child._id || child,
+      );
+
+      record = await attendanceModel
+        .find({
+          studentId: { $in: childIds },
+        })
+        .populate("studentId", "name classId");
+
+      return res.status(200).json({
+        success: true,
+        attendance: record,
+      });
+    }
+    if (req.user.role.name === "admin" || req.user.role.name === "teacher") {
       record = await attendanceModel.find({});
     } else {
       return res.status(403).json({ success: false, message: "Forbidden" });
@@ -24,10 +54,19 @@ const getMyAttendance = async (req, res) => {
 const getAttendance = async (req, res) => {
   try {
     const result = await attendanceModel.find({}).populate("studentId", "name");
+
     if (result.length === 0) {
-      return res.status(404).json({ success: false, message: "No attendance found" });
+      return res.status(404).json({
+        success: false,
+        message: "No attendance found",
+      });
     }
-    return res.status(200).json({ success: true, attendance: result });
+
+    return res.status(200).json({
+      success: true,
+      message: "All attendance found",
+      attendance: result,
+    });
   } catch (err) {
     return serverError(res);
   }
@@ -35,12 +74,49 @@ const getAttendance = async (req, res) => {
 
 const createAttendance = async (req, res) => {
   try {
-    const { studentId, date, status } = req.body;
-    const record = new attendanceModel({ studentId, date, status });
-    const saved = await record.save();
-    return res.status(201).json({ success: true, result: saved });
+    const { record } = req.body;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const studentIds = record.map((r) => r.studentId);
+    console.log(studentIds);
+
+    const existingRecords = await attendanceModel
+      .find({
+        studentId: { $in: studentIds },
+        date: { $gte: today },
+      })
+      .select("studentId");
+
+    const existingIdSet = new Set(
+      existingRecords.map((r) => r.studentId.toString()),
+    );
+
+    const dataToInsert = record
+      .filter((r) => !existingIdSet.has(r.studentId.toString()))
+      .map((r) => ({
+        studentId: r.studentId,
+        status: r.status,
+        date: new Date(),
+      }));
+
+    if (dataToInsert.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No new records to save; all duplicates ignored.",
+      });
+    }
+
+    const saved = await attendanceModel.insertMany(dataToInsert);
+
+    return res.status(201).json({
+      success: true,
+      message: `${saved.length} records saved successfully.`,
+      result: saved,
+    });
   } catch (err) {
-    return serverError(res);
+    console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

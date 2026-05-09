@@ -9,9 +9,11 @@ const initSocket =(server)=>{
     })
 
     io.on('connection',(socket)=>{
-        socket.on("join_room",(room)=>{
-            socket.join(room);
-
+        socket.on("register", (userId) => {
+    socket.join(userId); 
+  });
+        socket.on("join_room", (room) => {
+      socket.join(room);
         })
     })
 
@@ -19,7 +21,7 @@ const initSocket =(server)=>{
 }
  const getIo=()=>{
         if(!io){
-            return "Socket not found"
+             throw new Error("Socket not initialized");
         }
         else{
             return io

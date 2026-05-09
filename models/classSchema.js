@@ -6,4 +6,4 @@ name:{type:String ,required:true}
 
 
 })
-module.exports = mongoose.model("Class",classSchema)
+module.exports = mongoose.model("Classes",classSchema)
