@@ -6,7 +6,6 @@ const serverError = (req, res) => {
   });
 };
 
-const serverError = (res) => res.status(500).json({ success: false, message: "Server error" });
 
 const getMyAttendance = async (req, res) => {
   try {
