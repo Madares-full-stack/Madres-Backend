@@ -38,6 +38,7 @@ app.use("/api/lessons", require("./routers/lessonRoutes"));
 app.use("/api/tasks", require("./routers/taskRoutes"));
 app.use("/api/schedules", require("./routers/scheduleRoutes"));
 app.use("/chatbot", require("./routers/chatBotRouter"));
+app.use("/api/notifications", require("./routers/notificationRouter"));
 
 // 404
 app.all("*", (req, res, next) => {
