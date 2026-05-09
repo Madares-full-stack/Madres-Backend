@@ -57,41 +57,36 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
+ 
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required.",
-      });
+      return res.status(400).json({ success: false, message: "Email and password are required." });
     }
-
-  
+ 
     const user = await User.findOne({ email }).populate("role");
     if (!user) {
       return res.status(401).json({ success: false, message: "Invalid credentials." });
     }
-
+ 
+    if (user.googleId && !user.password) {
+      return res.status(400).json({ success: false, message: "This account uses Google Sign-in. Please login with Google." });
+    }
+ 
     const match = await user.comparePassword(password);
     if (!match) {
       return res.status(401).json({ success: false, message: "Invalid credentials." });
     }
-
+ 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role.name }, 
+      { id: user._id, email: user.email, role: user.role.name },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
     );
-
+ 
     return res.status(200).json({
       success: true,
       message: "Login successful.",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role.name, 
-      },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role.name },
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
