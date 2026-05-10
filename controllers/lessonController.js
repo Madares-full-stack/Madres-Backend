@@ -54,8 +54,8 @@ exports.getMyLessons = asyncHandler(async (req, res, next) => {
 
 exports.createLesson = asyncHandler(async (req, res, next) => {
   if (req.files) {
-    if (req.files.video) req.body.videoUrl = req.files.video[0].originalname;
-    if (req.files.file) req.body.fileUrl = req.files.file[0].originalname;
+     if (req.files.video) req.body.videoUrl = req.files.video[0].filename;
+    if (req.files.file) req.body.fileUrl = req.files.file[0].filename;
   }
 
   const newLesson = await Lesson.create(req.body);
