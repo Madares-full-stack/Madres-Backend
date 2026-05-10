@@ -1,5 +1,5 @@
 const attendanceModel = require("../models/attendanceSchema");
-const Notification = require("../models/notificationSchema");
+const Notification = require("../models/notificationschema");
 const User = require("../models/user.model");
 
 const serverError = (req, res) => {
