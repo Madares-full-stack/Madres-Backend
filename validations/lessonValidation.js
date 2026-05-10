@@ -5,7 +5,9 @@ exports.createLessonValidator = Joi.object({
   description: Joi.string().required(),
   subjectId: Joi.string().hex().length(24).required(),
   teacherId: Joi.string().hex().length(24).required(),
-  classId: Joi.string().hex().length(24).required()
+  classId: Joi.string().hex().length(24).required(),
+  videoUrl: Joi.string().allow('').optional(),
+  fileUrl: Joi.string().allow('').optional(),   
 });
 
 exports.updateLessonValidator = Joi.object({
@@ -13,5 +15,7 @@ exports.updateLessonValidator = Joi.object({
   description: Joi.string(),
   subjectId: Joi.string().hex().length(24),
   teacherId: Joi.string().hex().length(24),
-  classId: Joi.string().hex().length(24)
+  classId: Joi.string().hex().length(24),
+  videoUrl: Joi.string().allow('').optional(),  
+  fileUrl: Joi.string().allow('').optional(),   
 });
