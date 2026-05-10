@@ -9,12 +9,12 @@ const scheduleSchema = new mongoose.Schema(
     },
     subjectId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Subjects',
+      ref: 'Subject',
       required: true
     },
     teacherId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Teachers',
+      ref: 'User',
       required: true
     },
     day: {

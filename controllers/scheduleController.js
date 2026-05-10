@@ -21,7 +21,7 @@ exports.getAllSchedules = asyncHandler(async (req, res, next) => {
     .limit(limit)
     .populate('classId', 'name')
     .populate('subjectId', 'name')
-    .populate('teacherId', 'userId');
+    .populate('teacherId', 'name');
 
   res.status(200).json({ results: schedules.length, page, data: schedules });
 });
