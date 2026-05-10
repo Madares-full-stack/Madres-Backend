@@ -3,7 +3,9 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const path = require('path');
+const dns = require("node:dns");
 
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const connectDB = require("./models/db");
 const { initSocket } = require("./socket/socket");
 const ApiError = require('./utils/apiError')
