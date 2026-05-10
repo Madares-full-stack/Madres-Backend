@@ -2,6 +2,56 @@ const asyncHandler = require('express-async-handler');
 const Lesson = require('../models/Lesson');
 const ApiError = require('../utils/apiError');
 
+exports.getMyLessons = asyncHandler(async (req, res, next) => {
+  const userRole = req.user.role?.name;
+  const userId = req.user._id;
+
+  let lessons = [];
+
+  if (userRole === "student") {
+    const Class = require('../models/classSchema');
+    const studentClass = await Class.findOne({ students: userId });
+
+    if (!studentClass) {
+      return res.status(200).json({ results: 0, data: [] });
+    }
+
+    lessons = await Lesson.find({ classId: studentClass._id })
+      .populate('subjectId', 'name')
+      .populate('teacherId', 'name')
+      .populate('classId', 'name');
+
+  } else if (userRole === "teacher") {
+    lessons = await Lesson.find({ teacherId: userId })
+      .populate('subjectId', 'name')
+      .populate('classId', 'name');
+
+  } else if (userRole === "parent") {
+    const User = require('../models/user.model');
+    const Class = require('../models/classSchema');
+
+    const parent = await User.findById(userId);
+    const childIds = parent.children || [];
+
+    if (childIds.length === 0) {
+      return res.status(200).json({ results: 0, data: [] });
+    }
+
+    const classes = await Class.find({ students: { $in: childIds } });
+    const classIds = classes.map(c => c._id);
+
+    lessons = await Lesson.find({ classId: { $in: classIds } })
+      .populate('subjectId', 'name')
+      .populate('teacherId', 'name')
+      .populate('classId', 'name');
+
+  } else {
+    return next(new ApiError('Access forbidden', 403));
+  }
+
+  res.status(200).json({ results: lessons.length, data: lessons });
+});
+
 exports.createLesson = asyncHandler(async (req, res, next) => {
   if (req.files) {
     if (req.files.video) req.body.videoUrl = req.files.video[0].originalname;
