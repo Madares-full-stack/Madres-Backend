@@ -5,12 +5,14 @@ const {
   getAllTasks,
   getTaskById,
   updateTask,
-  deleteTask
+  deleteTask,
+   getMyTasks
 } = require('../controllers/taskController');
 const { verifyToken, authorizeRoles }  = require('../middlewares/auth.middleware');
 const validatorMiddleware = require('../middlewares/validatorMiddleware');
 const { createTaskValidator, updateTaskValidator } = require('../validations/taskValidation');
 
+router.get('/my', verifyToken, getMyTasks);
 router.route('/')
   .get(verifyToken, getAllTasks)
   .post(

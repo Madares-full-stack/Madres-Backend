@@ -5,13 +5,15 @@ const {
   getAllLessons,
   getLessonById,
   updateLesson,
-  deleteLesson
+  deleteLesson,
+  getMyLessons
 } = require('../controllers/lessonController');
 const { verifyToken, authorizeRoles }  = require('../middlewares/auth.middleware');
 const { uploadLessonFiles } = require('../middlewares/uploadMiddleware');
 const validatorMiddleware = require('../middlewares/validatorMiddleware');
 const { createLessonValidator, updateLessonValidator } = require('../validations/lessonValidation');
 
+router.get('/my', verifyToken, getMyLessons); 
 router.route('/')
   .get(verifyToken, getAllLessons)
   .post(
