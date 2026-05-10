@@ -58,7 +58,9 @@ const getClass = async (req, res) => {
 const getMyClass = async (req, res) => {
   try {
     const userId = req.user._id;
-    const userRole = req.user.role;
+
+    const userRole =
+      req.user.role?.name || req.user.role;
 
     let result;
 
@@ -76,25 +78,33 @@ const getMyClass = async (req, res) => {
 
     } else if (userRole === "parent") {
       const User = require("../models/user.model");
+
       const parent = await User.findById(userId);
-      const childIds = parent.children || [];
+
+      const childIds =
+        parent.children || [];
 
       result = await classModel
-        .find({ students: { $in: childIds } })
+        .find({
+          students: { $in: childIds },
+        })
         .populate("teacher", "name email")
         .populate("students", "name email");
 
     } else {
       return res.status(403).json({
         success: false,
-        message: "Use GET /classes for admin access",
+        message: "Forbidden",
       });
     }
 
-    if (!result || result.length === 0) {
+    if (
+      !result ||
+      (Array.isArray(result) &&
+        result.length === 0)
+    ) {
       return res.status(200).json({
         success: true,
-        message: "No class found",
         class: null,
       });
     }
@@ -103,11 +113,16 @@ const getMyClass = async (req, res) => {
       success: true,
       class: result,
     });
+
   } catch (err) {
-    return serverError(req, res);
+    console.log(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
-
 const createClass = async (req, res) => {
   try {
     const { name, teacher, students } = req.body;
