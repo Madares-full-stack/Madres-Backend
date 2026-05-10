@@ -1,7 +1,6 @@
 const Notification = require("../models/notificationSchema");
 const User = require("../models/user.model");
 
-// قواعد مين يبعت لمين
 const allowedMap = {
   teacher: ["student", "parent"],
   parent: ["teacher"],

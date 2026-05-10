@@ -56,7 +56,7 @@ ${lastRecords || "لا يوجد سجلات بعد"}
     const response = await axios.post(
       "https://api.groq.com/openai/v1/chat/completions",
       {
-        model: process.env.GROQ_MODEL || "llama3-8b-8192",
+        model: process.env.GROQ_MODEL ||  "llama-3.1-8b-instant",
         messages,
         max_tokens: 1000,
         temperature: 0.7,
