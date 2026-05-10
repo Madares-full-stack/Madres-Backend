@@ -6,7 +6,7 @@ const path = require('path');
 
 const connectDB = require("./models/db");
 const { initSocket } = require("./socket/socket");
-const ApiError = require("./utils/ApiError");
+const ApiError = require('./utils/apiError')
 const errorMiddleware = require("./middlewares/errorMiddleware");
 
 const app = express();
