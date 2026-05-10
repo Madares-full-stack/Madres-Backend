@@ -9,7 +9,6 @@ const {
 } = require("../controllers/attendanceController");
 const { verifyToken, authorizeRoles } = require("../middlewares/auth.middleware");
 
-// ← /my لازم قبل /:id
 router.get("/my", verifyToken, getMyAttendance);
 
 router.get("/", verifyToken, authorizeRoles("admin", "teacher"), getAttendance);

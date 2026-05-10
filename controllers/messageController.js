@@ -28,7 +28,6 @@ const sendMessage = async (req, res) => {
     io.to(room).emit("receive_message", populated);
     io.to(receiver.toString()).emit("receive_message", populated);
 
-    // ← notification للمستلم
     await Notification.create({
       recipient: receiver,
       sender: req.user._id,

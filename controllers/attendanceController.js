@@ -75,21 +75,21 @@ const createAttendance = async (req, res) => {
 
     const saved = await attendanceModel.insertMany(dataToInsert);
 
-    // ← أرسل notification للطالب الغائب وللـ parent
+    
     const absentRecords = dataToInsert.filter((r) => r.status === "absent");
 
     for (const absentRecord of absentRecords) {
       const student = await User.findById(absentRecord.studentId).populate("role");
       if (!student) continue;
 
-      // notification للطالب نفسه
+    
       await Notification.create({
         recipient: student._id,
         sender: req.user._id,
         message: `تم تسجيل غيابك بتاريخ ${new Date().toLocaleDateString("ar")}`,
       });
 
-      // notification للـ parent إذا موجود
+      
       const parents = await User.find({
         children: student._id,
       }).populate("role");
